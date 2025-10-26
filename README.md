@@ -37,6 +37,7 @@ MandelCLI renders stunning ASCII visualizations of the Mandelbrot and Julia sets
 - 🎨 **Interactive Exploration** — Navigate the Mandelbrot and Julia sets in real-time
 - ⌨️ **Keyboard Controls** — Smooth panning, zooming, and parameter tweaking
 - 🌈 **ASCII Art Rendering** — Beautiful density gradients using character ramps
+- 🎨 **Multiple Color Palettes** — Switch between classic, fire, ocean, and grayscale themes
 - 📊 **Performance Metrics** — Live FPS counter, iteration count, and viewport info
 - 🎭 **Dual Modes** — Toggle between Mandelbrot and Julia set visualizations
 - 🎨 **Color Support** — Rich terminal colors for enhanced visual experience
@@ -60,6 +61,7 @@ python main.py
 | `I` `K` | Adjust Julia constant (real part) |
 | `U` `M` | Adjust Julia constant (imaginary part) |
 | `1` `2` `3` `4` | Load bookmarked regions |
+| `C` | Cycle color palette |
 | `H` | Toggle help screen |
 | `R` | Reset to default view |
 | `Q` | Quit |
