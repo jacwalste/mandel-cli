@@ -14,3 +14,6 @@ build/
 .vscode/
 .idea/
 
+mandel_export_*.txt
+mandel_export_*.ans
+
