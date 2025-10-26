@@ -1,5 +1,6 @@
 import curses
 from render import FractalRenderer
+from export import FractalExporter
 
 
 class MandelCLI:
@@ -38,6 +39,9 @@ class MandelCLI:
         self.height, self.width = self.stdscr.getmaxyx()
         self.render_height = self.height - 3
         self.renderer = FractalRenderer(self.width, self.render_height, palette=self.palette_name)
+        self.exporter = FractalExporter()
+        self.export_message = None
+        self.export_message_time = 0
         
     def setup_curses(self):
         curses.curs_set(0)
@@ -167,9 +171,30 @@ class MandelCLI:
                 self.show_help = not self.show_help
             elif key == ord('c') or key == ord('C'):
                 self.cycle_palette()
+            elif key == ord('e') or key == ord('E'):
+                self.export_current_frame()
                 
         except:
             pass
+    
+    def export_current_frame(self):
+        import time
+        x_min, x_max, y_min, y_max = self.get_view_bounds()
+        
+        if self.mode == 'mandelbrot':
+            filename = self.exporter.export_current_view(
+                self.renderer, x_min, x_max, y_min, y_max,
+                self.max_iter, mode='mandelbrot'
+            )
+        else:
+            filename = self.exporter.export_current_view(
+                self.renderer, x_min, x_max, y_min, y_max,
+                self.max_iter, mode='julia',
+                c_real=self.julia_c_real, c_imag=self.julia_c_imag
+            )
+        
+        self.export_message = f"Exported to {filename}"
+        self.export_message_time = time.time()
     
     def cycle_palette(self):
         current_idx = self.palette_names.index(self.palette_name)
@@ -212,6 +237,8 @@ class MandelCLI:
         self.stdscr.refresh()
     
     def render_status_bar(self):
+        import time
+        
         if self.show_help:
             self.render_help_screen()
             return
@@ -233,7 +260,10 @@ class MandelCLI:
         
         status_line_2 = coord_text
         
-        help_line = "H:help C:palette Q:quit W/A/S/D:pan +/-:zoom 1-4:bookmarks"
+        help_line = "H:help C:palette E:export Q:quit W/A/S/D:pan +/-:zoom"
+        
+        if self.export_message and time.time() - self.export_message_time < 3:
+            help_line = self.export_message
         
         try:
             self.stdscr.addstr(self.render_height, 0, status_line_1[:self.width-1])
@@ -265,6 +295,7 @@ class MandelCLI:
             "",
             "Other:",
             "  C - Cycle color palette",
+            "  E - Export current view to file",
             "  H - Toggle this help screen",
             "  Q - Quit",
             "",

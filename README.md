@@ -41,6 +41,7 @@ MandelCLI renders stunning ASCII visualizations of the Mandelbrot and Julia sets
 - 📊 **Performance Metrics** — Live FPS counter, iteration count, and viewport info
 - 🎭 **Dual Modes** — Toggle between Mandelbrot and Julia set visualizations
 - 🎨 **Color Support** — Rich terminal colors for enhanced visual experience
+- 💾 **Export Capability** — Save current view to text file for sharing
 - ⚡ **Lightweight** — Minimal dependencies, maximum performance
 
 ## 🚀 Quick Start
@@ -62,6 +63,7 @@ python main.py
 | `U` `M` | Adjust Julia constant (imaginary part) |
 | `1` `2` `3` `4` | Load bookmarked regions |
 | `C` | Cycle color palette |
+| `E` | Export current view to file |
 | `H` | Toggle help screen |
 | `R` | Reset to default view |
 | `Q` | Quit |
