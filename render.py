@@ -1,13 +1,17 @@
 import time
+import curses
 
 
 class FractalRenderer:
     
     ASCII_RAMP = " .:-=+*#%@"
+    COLOR_PALETTE = [16, 17, 18, 19, 20, 21, 27, 33, 39, 45, 51, 50, 49, 48, 47, 46,
+                     82, 118, 154, 190, 226, 220, 214, 208, 202, 196, 160, 124, 88, 52]
     
-    def __init__(self, width, height):
+    def __init__(self, width, height, use_color=True):
         self.width = width
         self.height = height
+        self.use_color = use_color
         self.frame_times = []
         
     def mandelbrot(self, c, max_iter):
@@ -27,11 +31,18 @@ class FractalRenderer:
     
     def map_to_char(self, iterations, max_iter):
         if iterations == max_iter:
-            return self.ASCII_RAMP[-1]
+            return self.ASCII_RAMP[-1], None
         
         ratio = iterations / max_iter
-        index = int(ratio * (len(self.ASCII_RAMP) - 1))
-        return self.ASCII_RAMP[index]
+        char_index = int(ratio * (len(self.ASCII_RAMP) - 1))
+        char = self.ASCII_RAMP[char_index]
+        
+        if self.use_color and curses.has_colors():
+            color_index = int(ratio * (len(self.COLOR_PALETTE) - 1))
+            color = self.COLOR_PALETTE[color_index]
+            return char, color
+        
+        return char, None
     
     def render_mandelbrot(self, x_min, x_max, y_min, y_max, max_iter):
         start_time = time.time()
@@ -46,10 +57,10 @@ class FractalRenderer:
                 c = complex(x, y)
                 
                 iterations = self.mandelbrot(c, max_iter)
-                char = self.map_to_char(iterations, max_iter)
-                line.append(char)
+                char, color = self.map_to_char(iterations, max_iter)
+                line.append((char, color))
             
-            frame.append(''.join(line))
+            frame.append(line)
         
         render_time = time.time() - start_time
         self.frame_times.append(render_time)
@@ -72,10 +83,10 @@ class FractalRenderer:
                 z = complex(x, y)
                 
                 iterations = self.julia(z, c, max_iter)
-                char = self.map_to_char(iterations, max_iter)
-                line.append(char)
+                char, color = self.map_to_char(iterations, max_iter)
+                line.append((char, color))
             
-            frame.append(''.join(line))
+            frame.append(line)
         
         render_time = time.time() - start_time
         self.frame_times.append(render_time)

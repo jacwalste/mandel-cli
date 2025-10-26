@@ -164,10 +164,16 @@ class MandelCLI:
         
         for i, line in enumerate(frame):
             if i < self.render_height:
-                try:
-                    self.stdscr.addstr(i, 0, line)
-                except:
-                    pass
+                for j, (char, color) in enumerate(line):
+                    if j >= self.width:
+                        break
+                    try:
+                        if color is not None and curses.has_colors():
+                            self.stdscr.addstr(i, j, char, curses.color_pair(color % curses.COLORS))
+                        else:
+                            self.stdscr.addstr(i, j, char)
+                    except:
+                        pass
         
         self.render_status_bar()
         self.stdscr.refresh()
