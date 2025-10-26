@@ -59,8 +59,18 @@ python main.py
 | `J` | Toggle Mandelbrot ↔ Julia mode |
 | `I` `K` | Adjust Julia constant (real part) |
 | `U` `M` | Adjust Julia constant (imaginary part) |
+| `1` `2` `3` `4` | Load bookmarked regions |
+| `H` | Toggle help screen |
 | `R` | Reset to default view |
 | `Q` | Quit |
+
+### 🔖 Bookmarks
+
+Jump to famous Mandelbrot regions instantly:
+1. **Full View** - Classic complete set view
+2. **Seahorse Valley** - Intricate spiral formations
+3. **Spiral Detail** - Mesmerizing recursive patterns
+4. **Elephant Valley** - Unique bulbous structures
 
 ## 📦 Requirements
 
