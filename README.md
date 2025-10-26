@@ -1,8 +1,8 @@
-# 🌀 MandelCLI
+# MandelCLI
 
-**A retro-hacker's terminal-based fractal explorer**
+A terminal-based fractal explorer for the Mandelbrot and Julia sets.
 
-MandelCLI renders stunning ASCII visualizations of the Mandelbrot and Julia sets directly in your terminal. Navigate infinite mathematical beauty with real-time keyboard controls, smooth gradients, and vintage computing aesthetics.
+Real-time ASCII visualization with keyboard navigation. Written in Python using curses for cross-platform terminal rendering.
 
 ```
                     .::::::::::.
@@ -32,98 +32,140 @@ MandelCLI renders stunning ASCII visualizations of the Mandelbrot and Julia sets
                     .::::::::::.
 ```
 
-## ✨ Features
+## Features
 
-- 🎨 **Interactive Exploration** — Navigate the Mandelbrot and Julia sets in real-time
-- ⌨️ **Keyboard Controls** — Smooth panning, zooming, and parameter tweaking
-- 🌈 **ASCII Art Rendering** — Beautiful density gradients using character ramps
-- 🎨 **Multiple Color Palettes** — Switch between classic, fire, ocean, and grayscale themes
-- 📊 **Performance Metrics** — Live FPS counter, iteration count, and viewport info
-- 🎭 **Dual Modes** — Toggle between Mandelbrot and Julia set visualizations
-- 🎨 **Color Support** — Rich terminal colors for enhanced visual experience
-- 💾 **Export Capability** — Save current view to text file for sharing
-- ⚡ **Lightweight** — Minimal dependencies, maximum performance
+- Interactive Mandelbrot and Julia set exploration
+- Real-time panning, zooming, and parameter adjustment
+- ASCII rendering with density-based character mapping
+- 256-color terminal support with multiple palettes
+- Live performance metrics (FPS, iterations, viewport)
+- Bookmark system for interesting regions
+- Export frames to text files
+- Built on Python stdlib (curses only)
 
-## 🚀 Quick Start
+## Installation
 
 ```bash
-pip install -r requirements.txt
-python main.py
+git clone https://github.com/jacwalste/mandel-cli.git
+cd mandel-cli
+python3 main.py
 ```
 
-## 🎮 Controls
+No external dependencies required (except `windows-curses` on Windows).
 
-| Key | Action |
-|-----|--------|
-| `W` `A` `S` `D` | Pan view (up/left/down/right) |
-| `+` `-` | Zoom in/out |
-| `[` `]` | Decrease/increase iterations |
-| `J` | Toggle Mandelbrot ↔ Julia mode |
-| `I` `K` | Adjust Julia constant (real part) |
-| `U` `M` | Adjust Julia constant (imaginary part) |
-| `1` `2` `3` `4` | Load bookmarked regions |
-| `C` | Cycle color palette |
-| `E` | Export current view to file |
-| `H` | Toggle help screen |
-| `R` | Reset to default view |
-| `Q` | Quit |
+## Keyboard Controls
 
-### 🔖 Bookmarks
+| Key | Function |
+|-----|----------|
+| W/A/S/D | Pan viewport (up/left/down/right) |
+| +/- | Zoom in/out |
+| [/] | Decrease/increase max iterations |
+| J | Toggle between Mandelbrot and Julia modes |
+| I/K | Adjust Julia constant (real component) |
+| U/M | Adjust Julia constant (imaginary component) |
+| 1/2/3/4 | Jump to bookmarked regions |
+| C | Cycle color palette |
+| E | Export current frame to file |
+| H | Show help screen |
+| R | Reset view to defaults |
+| Q | Quit |
 
-Jump to famous Mandelbrot regions instantly:
-1. **Full View** - Classic complete set view
-2. **Seahorse Valley** - Intricate spiral formations
-3. **Spiral Detail** - Mesmerizing recursive patterns
-4. **Elephant Valley** - Unique bulbous structures
+### Preset Bookmarks
 
-## 📦 Requirements
+Available in Mandelbrot mode:
 
-- Python 3.8+
-- Terminal with Unicode support
-- `curses` (included with Python on Unix/macOS)
-- `windows-curses` (for Windows users)
+1. Full View - Standard overview of the complete set
+2. Seahorse Valley - Intricate spiral structures
+3. Spiral Detail - Fine recursive patterns
+4. Elephant Valley - Characteristic bulbous formations
 
-## 🎯 Technical Details
+## Technical Implementation
 
-MandelCLI uses escape-time algorithms to calculate fractal sets and maps iteration counts to ASCII characters for rendering. The application uses Python's curses library for terminal control and input handling.
+### Fractal Algorithms
 
-**Mandelbrot Set:** For each pixel c in the complex plane, iterate z = z² + c starting from z = 0.
+**Mandelbrot Set**: For each complex number c, iterate z(n+1) = z(n)^2 + c with z(0) = 0. 
+Count iterations until |z| > 2 or max iterations reached.
 
-**Julia Set:** For a fixed constant c, iterate z = z² + c for each pixel position z.
+**Julia Set**: For a fixed complex constant c, iterate z(n+1) = z(n)^2 + c with z(0) = pixel position.
+Count iterations until escape or max iterations.
 
-## 🛠️ Project Structure
+### Rendering Pipeline
+
+1. Map screen coordinates to complex plane
+2. Calculate escape-time iterations for each point
+3. Map iteration count to ASCII character via gradient
+4. Apply color based on iteration ratio and active palette
+5. Render to terminal buffer using curses
+
+### Performance
+
+Typical frame rates: 100-300 FPS depending on terminal size and iteration count.
+FPS averaging uses rolling 30-frame window for smooth metrics.
+
+## Architecture
 
 ```
 mandel-cli/
-├── main.py          # Application entry point
-├── render.py        # Fractal calculation and rendering
-├── controls.py      # Input handling and UI logic
-├── export.py        # File export functionality
-├── test_fractals.py # Test suite for fractal math
-├── demo.py          # Standalone demo script
-├── requirements.txt # Python dependencies
-├── LICENSE          # MIT License
-├── CHANGELOG.md     # Version history
-└── README.md        # This file
+├── main.py          - Entry point and curses wrapper
+├── render.py        - Fractal math and frame generation
+├── controls.py      - Input handling and UI state
+├── export.py        - File export utilities
+├── test_fractals.py - Unit tests for fractal calculations
+└── demo.py          - Non-interactive demo mode
 ```
 
-## 🧪 Testing
+## Color Palettes
 
-Run the test suite to verify fractal calculations:
+- **classic**: Blue-to-red gradient (30 colors)
+- **fire**: Warm spectrum, orange to yellow (16 colors)
+- **ocean**: Cool spectrum, blue to white (16 colors)
+- **grayscale**: Monochrome gradient (24 shades)
+
+Cycle between palettes with the `C` key during runtime.
+
+## Testing
+
+Run the test suite:
 
 ```bash
 python3 test_fractals.py
 ```
 
-## 🎨 Showcase
+Validates:
+- Mandelbrot iteration calculations
+- Julia set iteration calculations
+- Character mapping logic
+- Frame dimension accuracy
+- FPS calculation correctness
 
-Experience mathematical beauty in your terminal — from the iconic Mandelbrot bulb to morphing Julia sets. Perfect for demos, screencasts, or just zoning out while contemplating infinity.
+## Requirements
 
-## 📝 License
+- Python 3.8 or higher
+- Terminal supporting Unicode characters
+- For color: 256-color terminal emulator recommended
+- Windows: install `windows-curses` package
 
-MIT License - Explore freely!
+## Demo Mode
+
+For non-interactive preview:
+
+```bash
+python3 demo.py
+```
+
+Renders sample Mandelbrot and Julia frames with zoom sequence.
+
+## Export Format
+
+Pressing `E` exports the current view to a timestamped text file:
+- Format: `mandel_export_YYYYMMDD_HHMMSS.txt`
+- Plain ASCII output (color info stripped)
+- One line per terminal row
+
+## License
+
+MIT License. See LICENSE file for details.
 
 ---
 
-*Made with ❤️ for terminal enthusiasts and fractal lovers*
-
+Built for exploring infinite complexity in finite terminals.
