@@ -37,10 +37,14 @@ class FractalRenderer:
         char_index = int(ratio * (len(self.ASCII_RAMP) - 1))
         char = self.ASCII_RAMP[char_index]
         
-        if self.use_color and curses.has_colors():
-            color_index = int(ratio * (len(self.COLOR_PALETTE) - 1))
-            color = self.COLOR_PALETTE[color_index]
-            return char, color
+        if self.use_color:
+            try:
+                if curses.has_colors():
+                    color_index = int(ratio * (len(self.COLOR_PALETTE) - 1))
+                    color = self.COLOR_PALETTE[color_index]
+                    return char, color
+            except:
+                pass
         
         return char, None
     
