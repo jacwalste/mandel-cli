@@ -4,6 +4,13 @@ from render import FractalRenderer
 
 class MandelCLI:
     
+    BOOKMARKS = {
+        '1': {'name': 'Full View', 'x_min': -2.5, 'x_max': 1.0, 'y_min': -1.0, 'y_max': 1.0, 'iter': 50},
+        '2': {'name': 'Seahorse Valley', 'x_min': -0.75, 'x_max': -0.735, 'y_min': 0.095, 'y_max': 0.11, 'iter': 100},
+        '3': {'name': 'Spiral Detail', 'x_min': -0.7, 'x_max': -0.5, 'y_min': -0.1, 'y_max': 0.1, 'iter': 80},
+        '4': {'name': 'Elephant Valley', 'x_min': 0.25, 'x_max': 0.35, 'y_min': 0.0, 'y_max': 0.1, 'iter': 100},
+    }
+    
     def __init__(self, stdscr):
         self.stdscr = stdscr
         self.setup_curses()
@@ -24,6 +31,7 @@ class MandelCLI:
         
         self.max_iter = 50
         self.running = True
+        self.show_help = False
         
         self.height, self.width = self.stdscr.getmaxyx()
         self.render_height = self.height - 3
@@ -108,6 +116,15 @@ class MandelCLI:
         self.julia_c_real += real_delta
         self.julia_c_imag += imag_delta
     
+    def load_bookmark(self, key):
+        if key in self.BOOKMARKS and self.mode == "mandelbrot":
+            bookmark = self.BOOKMARKS[key]
+            self.mandelbrot_x_min = bookmark['x_min']
+            self.mandelbrot_x_max = bookmark['x_max']
+            self.mandelbrot_y_min = bookmark['y_min']
+            self.mandelbrot_y_max = bookmark['y_max']
+            self.max_iter = bookmark['iter']
+    
     def handle_input(self):
         try:
             key = self.stdscr.getch()
@@ -142,6 +159,10 @@ class MandelCLI:
                 self.adjust_julia_constant(imag_delta=0.05)
             elif key == ord('m') or key == ord('M'):
                 self.adjust_julia_constant(imag_delta=-0.05)
+            elif key in [ord('1'), ord('2'), ord('3'), ord('4')]:
+                self.load_bookmark(chr(key))
+            elif key == ord('h') or key == ord('H'):
+                self.show_help = not self.show_help
                 
         except:
             pass
@@ -179,6 +200,10 @@ class MandelCLI:
         self.stdscr.refresh()
     
     def render_status_bar(self):
+        if self.show_help:
+            self.render_help_screen()
+            return
+        
         fps = self.renderer.get_fps()
         x_min, x_max, y_min, y_max = self.get_view_bounds()
         
@@ -195,7 +220,7 @@ class MandelCLI:
         
         status_line_2 = coord_text
         
-        help_line = "Q:quit W/A/S/D:pan +/-:zoom [:]:iter J:mode R:reset"
+        help_line = "H:help Q:quit W/A/S/D:pan +/-:zoom [:]:iter 1-4:bookmarks"
         
         try:
             self.stdscr.addstr(self.render_height, 0, status_line_1[:self.width-1])
@@ -203,6 +228,45 @@ class MandelCLI:
             self.stdscr.addstr(self.render_height + 2, 0, help_line[:self.width-1])
         except:
             pass
+    
+    def render_help_screen(self):
+        help_text = [
+            "=== MANDELCLI CONTROLS ===",
+            "",
+            "Navigation:",
+            "  W/A/S/D - Pan up/left/down/right",
+            "  +/-     - Zoom in/out",
+            "  R       - Reset to default view",
+            "",
+            "Fractal Settings:",
+            "  [/]     - Decrease/increase iterations",
+            "  J       - Toggle Mandelbrot/Julia mode",
+            "  I/K     - Adjust Julia real part",
+            "  U/M     - Adjust Julia imaginary part",
+            "",
+            "Bookmarks (Mandelbrot mode):",
+            "  1 - Full View",
+            "  2 - Seahorse Valley",
+            "  3 - Spiral Detail",
+            "  4 - Elephant Valley",
+            "",
+            "Other:",
+            "  H - Toggle this help screen",
+            "  Q - Quit",
+            "",
+            "Press H to close help"
+        ]
+        
+        start_row = max(0, (self.render_height - len(help_text)) // 2)
+        
+        for i, line in enumerate(help_text):
+            row = start_row + i
+            if row < self.render_height:
+                col = max(0, (self.width - len(line)) // 2)
+                try:
+                    self.stdscr.addstr(row, col, line[:self.width-1])
+                except:
+                    pass
     
     def run(self):
         while self.running:
