@@ -98,9 +98,13 @@ mandel-cli/
 ├── main.py          # Application entry point
 ├── render.py        # Fractal calculation and rendering
 ├── controls.py      # Input handling and UI logic
+├── export.py        # File export functionality
 ├── test_fractals.py # Test suite for fractal math
+├── demo.py          # Standalone demo script
 ├── requirements.txt # Python dependencies
-└── README.md       # This file
+├── LICENSE          # MIT License
+├── CHANGELOG.md     # Version history
+└── README.md        # This file
 ```
 
 ## 🧪 Testing
