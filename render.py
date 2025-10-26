@@ -5,13 +5,22 @@ import curses
 class FractalRenderer:
     
     ASCII_RAMP = " .:-=+*#%@"
-    COLOR_PALETTE = [16, 17, 18, 19, 20, 21, 27, 33, 39, 45, 51, 50, 49, 48, 47, 46,
-                     82, 118, 154, 190, 226, 220, 214, 208, 202, 196, 160, 124, 88, 52]
+    ASCII_RAMP_DETAILED = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
     
-    def __init__(self, width, height, use_color=True):
+    COLOR_PALETTES = {
+        'classic': [16, 17, 18, 19, 20, 21, 27, 33, 39, 45, 51, 50, 49, 48, 47, 46,
+                    82, 118, 154, 190, 226, 220, 214, 208, 202, 196, 160, 124, 88, 52],
+        'fire': [16, 52, 88, 124, 160, 196, 202, 208, 214, 220, 226, 227, 228, 229, 230, 231],
+        'ocean': [16, 17, 18, 19, 20, 21, 27, 33, 39, 45, 51, 87, 123, 159, 195, 231],
+        'grayscale': [232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255],
+    }
+    
+    def __init__(self, width, height, use_color=True, palette='classic', detailed=False):
         self.width = width
         self.height = height
         self.use_color = use_color
+        self.palette = self.COLOR_PALETTES.get(palette, self.COLOR_PALETTES['classic'])
+        self.ascii_ramp = self.ASCII_RAMP_DETAILED if detailed else self.ASCII_RAMP
         self.frame_times = []
         
     def mandelbrot(self, c, max_iter):
@@ -31,22 +40,27 @@ class FractalRenderer:
     
     def map_to_char(self, iterations, max_iter):
         if iterations == max_iter:
-            return self.ASCII_RAMP[-1], None
+            return self.ascii_ramp[-1], None
         
         ratio = iterations / max_iter
-        char_index = int(ratio * (len(self.ASCII_RAMP) - 1))
-        char = self.ASCII_RAMP[char_index]
+        char_index = int(ratio * (len(self.ascii_ramp) - 1))
+        char = self.ascii_ramp[char_index]
         
         if self.use_color:
             try:
                 if curses.has_colors():
-                    color_index = int(ratio * (len(self.COLOR_PALETTE) - 1))
-                    color = self.COLOR_PALETTE[color_index]
+                    color_index = int(ratio * (len(self.palette) - 1))
+                    color = self.palette[color_index]
                     return char, color
             except:
                 pass
         
         return char, None
+    
+    def smooth_iterations(self, z, n, max_iter):
+        if n < max_iter:
+            return n + 1 - (abs(z).bit_length() - 2) / 2.0
+        return n
     
     def render_mandelbrot(self, x_min, x_max, y_min, y_max, max_iter):
         start_time = time.time()

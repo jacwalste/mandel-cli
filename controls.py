@@ -32,10 +32,12 @@ class MandelCLI:
         self.max_iter = 50
         self.running = True
         self.show_help = False
+        self.palette_name = 'classic'
+        self.palette_names = ['classic', 'fire', 'ocean', 'grayscale']
         
         self.height, self.width = self.stdscr.getmaxyx()
         self.render_height = self.height - 3
-        self.renderer = FractalRenderer(self.width, self.render_height)
+        self.renderer = FractalRenderer(self.width, self.render_height, palette=self.palette_name)
         
     def setup_curses(self):
         curses.curs_set(0)
@@ -163,9 +165,19 @@ class MandelCLI:
                 self.load_bookmark(chr(key))
             elif key == ord('h') or key == ord('H'):
                 self.show_help = not self.show_help
+            elif key == ord('c') or key == ord('C'):
+                self.cycle_palette()
                 
         except:
             pass
+    
+    def cycle_palette(self):
+        current_idx = self.palette_names.index(self.palette_name)
+        self.palette_name = self.palette_names[(current_idx + 1) % len(self.palette_names)]
+        self.renderer = FractalRenderer(
+            self.width, self.render_height, 
+            palette=self.palette_name
+        )
     
     def render_frame(self):
         x_min, x_max, y_min, y_max = self.get_view_bounds()
@@ -210,8 +222,9 @@ class MandelCLI:
         mode_text = f"Mode: {self.mode.upper()}"
         iter_text = f"Iter: {self.max_iter}"
         fps_text = f"FPS: {fps:.1f}"
+        palette_text = f"Palette: {self.palette_name}"
         
-        status_line_1 = f"{mode_text} | {iter_text} | {fps_text}"
+        status_line_1 = f"{mode_text} | {iter_text} | {fps_text} | {palette_text}"
         
         if self.mode == "julia":
             coord_text = f"c = {self.julia_c_real:.4f} + {self.julia_c_imag:.4f}i"
@@ -220,7 +233,7 @@ class MandelCLI:
         
         status_line_2 = coord_text
         
-        help_line = "H:help Q:quit W/A/S/D:pan +/-:zoom [:]:iter 1-4:bookmarks"
+        help_line = "H:help C:palette Q:quit W/A/S/D:pan +/-:zoom 1-4:bookmarks"
         
         try:
             self.stdscr.addstr(self.render_height, 0, status_line_1[:self.width-1])
@@ -251,6 +264,7 @@ class MandelCLI:
             "  4 - Elephant Valley",
             "",
             "Other:",
+            "  C - Cycle color palette",
             "  H - Toggle this help screen",
             "  Q - Quit",
             "",
